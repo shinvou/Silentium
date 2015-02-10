@@ -1,0 +1,8 @@
+Package: com.shinvou.Silentium
+Name: Silentium
+Depends: mobilesubstrate, applist
+Version: 1.0
+Architecture: iphoneos-arm
+Description: Silentium
+Author: Timm Kandziora
+Section: Tweaks

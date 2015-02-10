@@ -1,0 +1,10 @@
+{
+	entry = {
+		bundle = SilentiumSettings;
+		cell = PSLinkCell;
+		detail = "SilentiumSettingsListController";
+		icon = "SilentiumSettings.png";
+		isController = 1;
+		label = Silentium;
+	};
+}
