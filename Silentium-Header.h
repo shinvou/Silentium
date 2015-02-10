@@ -24,5 +24,10 @@
 @end
 
 @interface SBBannerController
+- (void)_playSoundForContext:(SBUIBannerContext *)bannerContext;
 - (void)_presentBannerForContext:(SBUIBannerContext *)bannerContext reason:(long long)reason;
+@end
+
+@interface SBLockScreenNotificationListController
+-(void)_playSoundForBulletinIfPossible:(BBBulletin *)bulletin;
 @end

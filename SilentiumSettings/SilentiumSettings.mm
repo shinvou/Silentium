@@ -62,7 +62,20 @@
         [silentiumEnabled setProperty:@(YES) forKey:@"enabled"];
         
         PSSpecifier *secondGroup = [PSSpecifier groupSpecifierWithName:nil];
-        [secondGroup setProperty:@"Choose the apps to be silenced by Silentium." forKey:@"footerText"];
+        [secondGroup setProperty:@"If enabled the notification sound will be played for silenced apps." forKey:@"footerText"];
+        
+        PSSpecifier *soundEnabled = [PSSpecifier preferenceSpecifierNamed:@"Sound enabled"
+                                                                   target:self
+                                                                      set:@selector(setValue:forSpecifier:)
+                                                                      get:@selector(getValueForSpecifier:)
+                                                                   detail:Nil
+                                                                     cell:PSSwitchCell
+                                                                     edit:Nil];
+        [soundEnabled setIdentifier:@"soundEnabled"];
+        [soundEnabled setProperty:@(YES) forKey:@"enabled"];
+        
+        PSSpecifier *thirdGroup = [PSSpecifier groupSpecifierWithName:nil];
+        [thirdGroup setProperty:@"Choose the apps to be silenced by Silentium." forKey:@"footerText"];
         
         PSSpecifier *applicationsLink = [PSSpecifier preferenceSpecifierNamed:@"Applications"
                                                                        target:self
@@ -77,8 +90,8 @@
         [applicationsLink setProperty:@"Silenced:" forKey:@"ALSettingsKeyPrefix"];
         [applicationsLink setProperty:@"/System/Library/PreferenceBundles/AppList.bundle" forKey:@"lazy-bundle"];
         
-        PSSpecifier *thirdGroup = [PSSpecifier groupSpecifierWithName:@"contact developer"];
-        [thirdGroup setProperty:@"Feel free to follow me on twitter for any updates on my apps and tweaks or contact me for support questions.\n \nThis tweak is Open-Source, so make sure to check out my GitHub." forKey:@"footerText"];
+        PSSpecifier *fourthGroup = [PSSpecifier groupSpecifierWithName:@"contact developer"];
+        [fourthGroup setProperty:@"Feel free to follow me on twitter for any updates on my apps and tweaks or contact me for support questions.\n \nThis tweak is Open-Source, so make sure to check out my GitHub." forKey:@"footerText"];
         
         PSSpecifier *twitter = [PSSpecifier preferenceSpecifierNamed:@"twitter"
                                                               target:self
@@ -106,7 +119,7 @@
         [github setProperty:@(YES) forKey:@"enabled"];
         [github setProperty:[UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/SilentiumSettings.bundle/github.png"] forKey:@"iconImage"];
         
-        _specifiers = [NSArray arrayWithObjects:banner, firstGroup, silentiumEnabled, secondGroup, applicationsLink, thirdGroup, twitter, github, nil];
+        _specifiers = [NSArray arrayWithObjects:banner, firstGroup, silentiumEnabled, secondGroup, soundEnabled, thirdGroup, applicationsLink, fourthGroup, twitter, github, nil];
     }
     
     return _specifiers;
@@ -126,6 +139,16 @@
         } else {
             return @(YES);
         }
+    } else if ([specifier.identifier isEqualToString:@"soundEnabled"]) {
+        if (settings) {
+            if ([settings objectForKey:@"soundEnabled"]) {
+                return [settings objectForKey:@"soundEnabled"];
+            } else {
+                return @(NO);
+            }
+        } else {
+            return @(NO);
+        }
     }
     
     return nil;
@@ -139,8 +162,17 @@
     if ([specifier.identifier isEqualToString:@"silentiumEnabled"]) {
         [settings setObject:value forKey:@"silentiumEnabled"];
         [settings writeToFile:settingsPath atomically:YES];
+    } else if ([specifier.identifier isEqualToString:@"soundEnabled"]) {
+        [settings setObject:value forKey:@"soundEnabled"];
+        [settings writeToFile:settingsPath atomically:YES];
     }
     
+    CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.shinvou.silentium/reloadSettings"), NULL, NULL, TRUE);
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
     CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.shinvou.silentium/reloadSettings"), NULL, NULL, TRUE);
 }
 

@@ -9,6 +9,7 @@
 #import "Silentium-Header.h"
 
 static BOOL silentiumEnabled = YES;
+static BOOL soundEnabled = NO;
 static NSMutableArray *silencedApplications = nil;
 
 #pragma mark - Helper
@@ -55,6 +56,7 @@ static BOOL SilenceApplicationWithIdentifier(NSString *identifier)
 		if (!SilenceApplicationWithIdentifier([bulletin sectionID])) {
 			return %orig();
 		} else {
+			if (soundEnabled) [self _playSoundForBulletinIfPossible:bulletin];
 			NSLog(@"[Silentium] Didn't add %@ to lockscreen.", [bulletin sectionID]);
 			return nil;
 		}
@@ -79,6 +81,7 @@ static BOOL SilenceApplicationWithIdentifier(NSString *identifier)
 		if (!SilenceApplicationWithIdentifier(sectionID)) {
 			%orig();
 		} else {
+			if (soundEnabled) [self _playSoundForContext:bannerContext];
 			NSLog(@"[Silentium] Presenting banner for %@ is disabled.", sectionID);
 		}
 	}
@@ -93,6 +96,10 @@ static void ReloadSettings()
 	if (settings) {
 		if ([settings objectForKey:@"silentiumEnabled"]) {
 			silentiumEnabled = [[settings objectForKey:@"silentiumEnabled"] boolValue];
+		}
+
+		if ([settings objectForKey:@"soundEnabled"]) {
+			soundEnabled = [[settings objectForKey:@"soundEnabled"] boolValue];
 		}
 
 		silencedApplications = [[NSMutableArray alloc] init];
